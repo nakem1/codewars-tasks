@@ -1,1 +1,1 @@
-# codewars_tasks
+# codewars-tasks
