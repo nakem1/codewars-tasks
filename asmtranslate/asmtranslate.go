@@ -57,17 +57,33 @@ func handleCommand(registers asm, split []string, val string) {
 	}
 }
 
+func checkVariable(registers asm, str string) bool {
+	if val, err := strconv.Atoi(str); err != nil {
+		if registers[str] != 0 {
+			return true
+		}
+	} else {
+		if val != 0 {
+			return true
+		}
+	}
+	return (false)
+}
+
 func SimpleAssembler(program []string) map[string]int {
 	registers := make(asm)
 	size := len(program)
 	for i := 0; i < size; i++ {
 		split := strings.Fields(program[i])
-		if split[0] == "jnz" && registers[split[1]] != 0 {
+		if split[0] == "jnz" && checkVariable(registers, split[1]) {
 			step, _ := strconv.Atoi(split[2])
 			i += step
+			if i >= size {
+				break
+			}
 			split = strings.Fields(program[i])
 		}
 		handleCommand(registers, split, program[i])
 	}
-	return (registers)
+	return (map[string]int(registers))
 }
