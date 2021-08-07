@@ -11,12 +11,8 @@
 			"mode": "auto",
 			"program": "${fileName}",
 			"args": [
-				"mov a 5",
-				"inc a",
-				"dec a",
-				"dec a",
-				"jnz a -1",
-				"inc a",
+				"Are they here",
+				"yes, they are here",
 			]
 		}
 	]

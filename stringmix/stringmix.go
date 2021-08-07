@@ -1,81 +1,61 @@
 package stringmix
 
 import (
-	"fmt"
+	"sort"
 	"strings"
 )
 
 type str struct {
-	letter   rune
-	count1   int
-	count2   int
-	maxCount int
-}
-
-type max struct {
-	maxDig  int
-	maxChar rune
+	letter rune
+	count1 int
+	count2 int
 }
 
 type mainMap map[rune]*str
 
+func isAlpha(ch rune) bool {
+	if ch >= 'a' && ch <= 'z' {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (m mainMap) addStr(s string, pos int) {
 	for _, val := range s {
-		if dig, found := m[val]; !found {
-			if pos == 1 {
-				m[val] = &str{val, 1, 0, -1}
+		if isAlpha(val) {
+			if dig, found := m[val]; !found {
+				if pos == 1 {
+					m[val] = &str{val, 1, 0}
+				} else {
+					m[val] = &str{val, 0, 1}
+				}
 			} else {
-				m[val] = &str{val, 0, 1, -1}
-			}
-		} else {
-			if pos == 1 {
-				dig.count1++
-			} else {
-				dig.count2++
+				if pos == 1 {
+					dig.count1++
+				} else {
+					dig.count2++
+				}
 			}
 		}
 	}
 }
 
-func (m mainMap) findMax() (str, error) {
-	var maxTmp int = -1
-	var max str = str{'+', -1, -1, -1}
-	for key, val := range m {
-		if val.count1 > val.count2 {
-			maxTmp = val.count1
-		} else {
-			maxTmp = val.count2
-		}
-		if maxTmp == max.maxCount && key > max.letter || maxTmp > max.maxCount {
-			max = *val
-		}
-	}
-	if max.maxCount == -1 {
-		err := fmt.Errorf("maxdig not found")
-		return str{}, err
-	}
-	delete(m, max.letter)
-	return max, nil
-}
-
-func (m mainMap) setMaxCount() {
+func (m mainMap) deleteLoner() {
 	for _, val := range m {
-		if val.count1 > val.count2 {
-			val.maxCount = val.count1
-		} else {
-			val.maxCount = val.count2
+		if val.count1 <= 1 && val.count2 <= 1 {
+			delete(m, val.letter)
 		}
 	}
 }
 
 func sprintResult(strNum rune, letter rune, count int) string {
-	str := make([]rune, count+3)
+	str := make([]rune, 0, count+3)
 	str = append(str, strNum)
 	str = append(str, ':')
 	for i := 0; i < count; i++ {
 		str = append(str, letter)
 	}
-	fmt.Printf("/")
 	str = append(str, '/')
 	return string(str)
 }
@@ -95,14 +75,23 @@ func Mix(s1, s2 string) string {
 	mainMap := make(mainMap)
 	mainMap.addStr(s1, 1)
 	mainMap.addStr(s2, 2)
-	mainMap.setMaxCount()
-	for {
-		res, err := mainMap.findMax()
-		if err != nil {
-			break
-		} else {
-			retStr = append(retStr, handleResult(res))
-		}
+	mainMap.deleteLoner()
+	for _, val := range mainMap {
+		retStr = append(retStr, handleResult(*val))
 	}
+	sort.Slice(retStr, func(i, j int) bool {
+		if len(retStr[i]) < len(retStr[j]) {
+			return false
+		} else if len(retStr[i]) > len(retStr[j]) {
+			return true
+		} else {
+			return retStr[i] < retStr[j]
+		}
+	})
+	size := len(retStr) - 1
+	if size == -1 {
+		return ""
+	}
+	retStr[size] = retStr[size][:len(retStr[size])-1]
 	return strings.Join(retStr, "")
 }

@@ -52,12 +52,12 @@ func (Brackets *stack) addCloseBracket(closeBracket rune) bool {
 	case '}':
 		openBracket = '{'
 	}
-	if (Brackets.lenght >= 1) {
+	if Brackets.lenght >= 1 {
 		Brackets.Push(closeBracket)
 	} else {
 		return (false)
 	}
-	if (Brackets.stack[len(Brackets.stack) - 2] == openBracket) {
+	if Brackets.stack[len(Brackets.stack)-2] == openBracket {
 		Brackets.Pop()
 		Brackets.Pop()
 	}
@@ -71,7 +71,7 @@ func ValidBraces(str string) bool {
 		case '(', '[', '{':
 			Brackets.Push(val)
 		case ')', ']', '}':
-			if (!Brackets.addCloseBracket(val)) {
+			if !Brackets.addCloseBracket(val) {
 				return (false)
 			}
 		}
